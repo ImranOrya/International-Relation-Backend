@@ -2064,6 +2064,30 @@ class DatabaseSeeder extends Seeder
             "role" => RoleEnum::admin,
             "permission" => "reports"
         ]);
+        RolePermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "role" => RoleEnum::admin,
+            "permission" => "ngo"
+        ]);
+        RolePermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "role" => RoleEnum::admin,
+            "permission" => "donor"
+        ]);
+        RolePermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "role" => RoleEnum::admin,
+            "permission" => "projects"
+        ]);
         // User permission
         RolePermission::factory()->create([
             "view" => true,
