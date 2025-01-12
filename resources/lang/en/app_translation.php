@@ -10,6 +10,8 @@ return [
     'email_exist' => 'Email already exist!',
     'incorrect_credentials' => 'Provided credentials are incorrect.',
     "account_is_lock" => "Your account is lock.",
+    "account_is_block" => "Your account is block.",
+    
     'profile_changed' => 'Profile updated successfully.',
     'password_changed' => 'Password updated successfully.',
     'incorrect_password' => 'Old password is incorrect.',
