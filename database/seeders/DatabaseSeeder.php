@@ -350,7 +350,7 @@ class DatabaseSeeder extends Seeder
             "edit" => true,
             "delete" => true,
             "add" => true,
-            "user_id" => 1,
+            "user_id" => 4,
             "permission" => "ngo"
         ]);
         UserPermission::factory()->create([
@@ -358,7 +358,7 @@ class DatabaseSeeder extends Seeder
             "edit" => true,
             "delete" => true,
             "add" => true,
-            "user_id" => 1,
+            "user_id" => 4,
             "permission" => "donor"
         ]);
         UserPermission::factory()->create([
@@ -366,7 +366,7 @@ class DatabaseSeeder extends Seeder
             "edit" => true,
             "delete" => true,
             "add" => true,
-            "user_id" => 1,
+            "user_id" => 4,
             "permission" => "projects"
         ]);
         UserPermission::factory()->create([
