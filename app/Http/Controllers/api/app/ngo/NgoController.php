@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\api\app;
+namespace App\Http\Controllers\api\app\ngo;
 
 use App\Models\Ngo;
 use App\Models\Email;

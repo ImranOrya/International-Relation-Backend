@@ -46,6 +46,15 @@ return [
             'driver' => 'sway',  // Custom driver for User guard
             'provider' => 'users',     // This provider points to the User model
         ],
+          'ngo:api' => [
+            'driver' => 'sway',  // Custom driver for User guard
+            'provider' => 'ngos',     // This provider points to the User model
+        ],
+          'donor:api' => [
+            'driver' => 'sway',  // Custom driver for User guard
+            'provider' => 'donors',     // This provider points to the User model
+        ],
+        
     ],
 
     /*
@@ -69,6 +78,14 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
+        ],
+          'ngos' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Ngo::class),
+        ],
+          'donors' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Donor::class),
         ],
 
         // 'users' => [

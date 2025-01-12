@@ -6,14 +6,15 @@ use App\Traits\template\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Sway\Traits\InvalidatableToken;
+
 
 class Ngo extends Model
 {
     //
 
 
-     use HasFactory, Notifiable, HasApiTokens, Auditable;
+     use HasFactory, Notifiable, InvalidatableToken, Auditable;
     /**
      * The attributes that are mass assignable.
      *
