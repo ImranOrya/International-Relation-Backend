@@ -20,6 +20,8 @@ use App\Models\AddressTran;
 
 class NgoController extends Controller
 {
+
+
     public function ngos(Request $request, $page)
     {
         $locale = App::getLocale();
@@ -185,14 +187,19 @@ class NgoController extends Controller
     }
     public function profileUpdate(NgoProfileUpdateRequest $request, $id)
     {
-        $validatedData = $request->validated();
+
 
         // Find the NGO
         $ngo = Ngo::find($id);
 
         if (!$ngo || $ngo->is_editable != 1) {
-            return response()->json(['message' => 'NGO is not editable or not found'], 403);
+            return response()->json(['message' => __('app_translation.notEditable')], 403);
+       
         }
+
+
+        $validatedData = $request->validated();
+
         try {
             // Begin transaction
             DB::beginTransaction();
@@ -216,13 +223,14 @@ class NgoController extends Controller
                     'introduction' => $validatedData['introduction_en']
                 ]);
             } else {
-                return response()->json(['message' => 'NgoTran record not found'], 404);
+                return response()->json(['message' => __('app_translation.not_found')], 404);
             }
 
             // Manage multilingual NgoTran records
             $languages = [
                 'ps',
                 'fa'
+
             ];
 
             foreach ($languages as   $suffix) {
@@ -244,7 +252,7 @@ class NgoController extends Controller
             $directorController->store($request, $id);
 
             // store document
-
+            
 
 
 
@@ -260,7 +268,7 @@ class NgoController extends Controller
         } catch (\Exception $e) {
             // Rollback on error
             DB::rollBack();
-            return response()->json(['message' => 'An error occurred: ' . $e->getMessage()], 500);
+            return response()->json(['message' => __('app_translation.server_error') . $e->getMessage()], 500);
         }
     }
 }
