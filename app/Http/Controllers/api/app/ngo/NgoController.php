@@ -195,7 +195,6 @@ class NgoController extends Controller
 
         if (!$ngo || $ngo->is_editable != 1) {
             return response()->json(['message' => __('app_translation.notEditable')], 403);
-       
         }
 
 
