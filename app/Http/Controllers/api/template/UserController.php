@@ -2,26 +2,27 @@
 
 namespace App\Http\Controllers\api\template;
 
-use App\Enums\LanguageEnum;
-use App\Enums\RoleEnum;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\template\user\UpdateUserPasswordRequest;
-use App\Http\Requests\template\user\UpdateUserRequest;
-use App\Http\Requests\template\user\UserRegisterRequest;
-use App\Models\Contact;
-use App\Models\Destination;
-use App\Models\Email;
-use App\Models\ModelJob;
-use App\Models\RolePermission;
+use Carbon\Carbon;
 use App\Models\User;
-use App\Models\UserPermission;
+use App\Models\Email;
+use App\Enums\RoleEnum;
+use App\Models\Contact;
+use App\Models\ModelJob;
+use App\Enums\LanguageEnum;
+use App\Models\Destination;
 use App\Models\UsersEnView;
 use App\Models\UsersFaView;
 use App\Models\UsersPsView;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Carbon\Carbon;
+use App\Models\RolePermission;
+use App\Models\UserPermission;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\template\user\UpdateUserRequest;
+use App\Http\Requests\template\user\UserRegisterRequest;
+use App\Http\Requests\template\user\UpdateUserPasswordRequest;
 
 class UserController extends Controller
 {
@@ -402,12 +403,20 @@ class UserController extends Controller
     }
     public function userCount()
     {
+        $statistics = DB::select("
+            SELECT
+                COUNT(*) AS userCount,
+                (SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE()) AS todayCount,
+                (SELECT COUNT(*) FROM users WHERE status = 1) AS activeUserCount,
+                (SELECT COUNT(*) FROM users WHERE status = 0) AS inActiveUserCount
+            FROM users
+        ");
         return response()->json([
             'counts' => [
-                "userCount" => User::count(),
-                "todayCount" => User::whereDate('created_at', Carbon::today())->count(),
-                "activeUserCount" => User::where('status', true)->count(),
-                "inActiveUserCount" =>  User::where('status', false)->count()
+                "userCount" => $statistics[0]->userCount,
+                "todayCount" => $statistics[0]->todayCount,
+                "activeUserCount" => $statistics[0]->activeUserCount,
+                "inActiveUserCount" =>  $statistics[0]->inActiveUserCount
             ],
         ], 200, [], JSON_UNESCAPED_UNICODE);
     }

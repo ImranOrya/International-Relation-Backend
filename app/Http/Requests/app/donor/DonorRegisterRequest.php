@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests\app\donor;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -26,8 +27,7 @@ class DonorRegisterRequest extends FormRequest
             'contact' => 'required|regex:/^[0-9]{10}$/|unique:contacts,value',
             'name' => 'required|string|max:255',
             'username' => 'required|string|max:255',
-            'password' => 'required|string|min:8|max:25|confirmed', 
-        
+            'password' => 'required|string|min:8|max:25|confirmed',
         ];
     }
 }
