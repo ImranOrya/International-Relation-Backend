@@ -23,7 +23,7 @@ class NewsController extends Controller
 
        $query = News::with([
         'newsTran' =>function ($query) use ($locale){
-            $query->where('language_name',$locale)->select('id','news_id','')
+            $query->where('language_name',$locale)->select('id','news_id','');
         }
        ]);
        
@@ -85,20 +85,32 @@ public function store(NewsStoreRequest $request)
     }
         // Create NewsTrans (translations)
         $languages = [
-            ['name' => LanguageEnum::default->value, 'content' => $validatedData['contents_en']],
-            ['name' => LanguageEnum::pashto->value, 'content' => $validatedData['contents_ps']],
-            ['name' => LanguageEnum::farsi->value, 'content' => $validatedData['contents_fa']],
+            ['name' => LanguageEnum::default->value, 'content' => $validatedData['contents_en'],'title' => $validatedData['title_en']],
+            ['name' => LanguageEnum::pashto->value, 'content' => $validatedData['contents_ps'],'title' => $validatedData['title_ps']],
+            ['name' => LanguageEnum::farsi->value, 'content' => $validatedData['contents_fa'],'title' => $validatedData['title_fa']],
+
         ];
         foreach ($languages as $language) {
             NewsTran::create([
                 'news_id' => $news->id,
                 'language_name' => $language['name'],
                 'contents' => $language['content'],
+                'title' => $language['title']
             ]);
         }
 
         // Create NewsDocuments
     
+        $path = $this->storeDocument($request,'public',"news/{$news->id}");
+
+        NewsDocument::create([
+            'news_id' => $news->id,
+            'url' =>$path['path'],
+            'extintion' =>$path['extintion']
+
+
+        ]);
+
 
         // Commit transaction
         DB::commit();

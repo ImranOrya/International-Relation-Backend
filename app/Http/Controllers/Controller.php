@@ -12,11 +12,12 @@ use Illuminate\Support\Facades\App;
 
 abstract class Controller
 {
-    public function storeProfile(Request $request)
+    public function storeProfile(Request $request,$dynamic_path ='user-profile')
     {
         try {
             // 1. If storage not exist create it.
-            $path = storage_path() . "/app/private/user-profile/";
+           
+            $path = storage_path() . "/app/private/".$dynamic_path."/";
             // Checks directory exist if not will be created.
             !is_dir($path) &&
                 mkdir($path, 0777, true);
@@ -29,17 +30,17 @@ abstract class Controller
                     $fileName = Str::uuid() . '.' . $file->extension();
                     $file->move($path, $fileName);
 
-                    return "private/user-profile/" . $fileName;
+                    return "private/".$dynamic_path."/" . $fileName;
                 }
             }
         } catch (Exception $err) {
         }
         return null;
     }
-    public function storeDocument(Request $request, $folder)
+    public function storeDocument(Request $request,$access ='private', $folder)
     {
         // 1. If storage not exist create it.
-        $path = storage_path() . "/app/private/documents/{$folder}/";
+        $path = storage_path() . "/app/{$access}/documents/{$folder}/";
         // Checks directory exist if not will be created.
         !is_dir($path) &&
             mkdir($path, 0777, true);
@@ -48,13 +49,15 @@ abstract class Controller
         $fileName = null;
         if ($request->hasFile('document')) {
             $file = $request->file('document');
+            $fileExtention =$file->extension();
             if ($file != null) {
-                $fileName = Str::uuid() . '.' . $file->extension();
+                $fileName = Str::uuid() . '.' . $fileExtention;
                 $file->move($path, $fileName);
 
                 return [
-                    "path" => "private/documents/{$folder}/" . $fileName,
+                    "path" => "{$access}/documents/{$folder}/" . $fileName,
                     "name" => $file->getClientOriginalName(),
+                    "extintion" => $fileExtention
                 ];
             }
         }

@@ -27,7 +27,6 @@ return new class extends Migration
                 ->onDelete('no action');
             $table->boolean('visible');
             $table->string('expiry_date',32);
-           $table->longText('contents');
             $table->timestamps();
         });
     }

@@ -204,7 +204,7 @@ class NgoController extends Controller
             // Begin transaction
             DB::beginTransaction();
 
-            $path = $this->storeProfile($request);
+            $path = $this->storeProfile($request,'ngo-profile');
             $ngo->update([
                 "profile" =>  $path,
             ]);
