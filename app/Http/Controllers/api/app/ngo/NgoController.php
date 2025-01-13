@@ -7,6 +7,7 @@ use App\Models\Email;
 use App\Models\Address;
 use App\Models\NgoTran;
 use App\Enums\LanguageEnum;
+use App\Enums\StatusTypeEnum;
 use App\Http\Requests\app\ngo\NgoProfileUpdateRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\App;
@@ -244,23 +245,32 @@ class NgoController extends Controller
             $directorController->store($request, $id);
 
             // store document
-
-
-
-
-
-
-
             // Commit transaction
             DB::commit();
-
-
-
             return response()->json(['message' => __('app_translation.success')], 200);
         } catch (\Exception $e) {
             // Rollback on error
             DB::rollBack();
             return response()->json(['message' => 'An error occurred: ' . $e->getMessage()], 500);
         }
+    }
+    public function ngoCount()
+    {
+        $statistics = DB::select("
+        SELECT
+         COUNT(*) AS count,
+            (SELECT COUNT(*) FROM ngos WHERE DATE(created_at) = CURDATE()) AS todayCount,
+            (SELECT COUNT(*) FROM ngos n JOIN ngo_statuses ns ON n.id = ns.ngo_id WHERE ns.status_type_id = ?) AS activeCount,
+         (SELECT COUNT(*) FROM ngos n JOIN ngo_statuses ns ON n.id = ns.ngo_id WHERE ns.status_type_id = ?) AS unRegisteredCount
+        FROM ngos
+    ", [StatusTypeEnum::active->value, StatusTypeEnum::unregistered->value]);
+        return response()->json([
+            'counts' => [
+                "count" => $statistics[0]->count,
+                "todayCount" => $statistics[0]->todayCount,
+                "activeCount" => $statistics[0]->activeCount,
+                "unRegisteredCount" =>  $statistics[0]->unRegisteredCount
+            ],
+        ], 200, [], JSON_UNESCAPED_UNICODE);
     }
 }
