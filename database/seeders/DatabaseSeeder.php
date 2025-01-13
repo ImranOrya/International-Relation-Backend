@@ -152,6 +152,8 @@ class DatabaseSeeder extends Seeder
         $projects = 'public/icons/projects.svg';
         $ngo = 'public/icons/ngo.svg';
         $donor = 'public/icons/donor.svg';
+        $management = 'public/icons/management.svg';
+        $managementNews = 'public/icons/management-news.svg';
 
         Permission::factory()->create([
             "name" => "dashboard",
@@ -166,37 +168,47 @@ class DatabaseSeeder extends Seeder
         Permission::factory()->create([
             "name" => "donor",
             "icon" => $donor,
-            "priority" => 2
+            "priority" => 3
         ]);
         Permission::factory()->create([
             "name" => "projects",
             "icon" => $projects,
-            "priority" => 3
+            "priority" => 4
+        ]);
+        Permission::factory()->create([
+            "name" => "management/news",
+            "icon" => $management,
+            "priority" => 5
+        ]);
+        Permission::factory()->create([
+            "name" => "management/about",
+            "icon" => $managementNews,
+            "priority" => 5
         ]);
         Permission::factory()->create([
             "name" => "users",
             "icon" => $users,
-            "priority" => 4
+            "priority" => 6
         ]);
         Permission::factory()->create([
             "name" => "reports",
             "icon" => $chart,
-            "priority" => 5
+            "priority" => 7
         ]);
         Permission::factory()->create([
             "name" => "logs",
             "icon" => $logs,
-            "priority" => 6
+            "priority" => 8
         ]);
         Permission::factory()->create([
             "name" => "audit",
             "icon" => $audit,
-            "priority" => 7
+            "priority" => 9
         ]);
         Permission::factory()->create([
             "name" => "settings",
             "icon" => $settings,
-            "priority" => 8
+            "priority" => 10
         ]);
         UserPermission::factory()->create([
             "view" => true,
@@ -229,6 +241,22 @@ class DatabaseSeeder extends Seeder
             "add" => true,
             "user_id" => 1,
             "permission" => "projects"
+        ]);
+        UserPermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "user_id" => 1,
+            "permission" => "management/news"
+        ]);
+        UserPermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "user_id" => 1,
+            "permission" => "management/about"
         ]);
         UserPermission::factory()->create([
             "view" => true,
@@ -294,6 +322,22 @@ class DatabaseSeeder extends Seeder
             "add" => true,
             "user_id" => 2,
             "permission" => "projects"
+        ]);
+        UserPermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "user_id" => 2,
+            "permission" => "management/news"
+        ]);
+        UserPermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "user_id" => 2,
+            "permission" => "management/about"
         ]);
         UserPermission::factory()->create([
             "view" => true,
@@ -368,6 +412,22 @@ class DatabaseSeeder extends Seeder
             "add" => true,
             "user_id" => 4,
             "permission" => "projects"
+        ]);
+        UserPermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "user_id" => 4,
+            "permission" => "management/news"
+        ]);
+        UserPermission::factory()->create([
+            "view" => true,
+            "edit" => true,
+            "delete" => true,
+            "add" => true,
+            "user_id" => 4,
+            "permission" => "management/about"
         ]);
         UserPermission::factory()->create([
             "view" => true,
