@@ -18,6 +18,7 @@ class News extends Model
 
 
     
+   
     public function newsType(){
 
         return $this->belongsTo(NewsType::class,'news_type_id');
@@ -30,7 +31,13 @@ class News extends Model
 
     public function newsDocument(){
         
-        return $this->hasMany(NewsDocument::class,'id','news_id');
+        return $this->hasMany(NewsDocument::class);
+    }
+
+    public function newsTran(){
+
+        return $this->hasMany(NewsTran::class);
+   
     }
 
 
