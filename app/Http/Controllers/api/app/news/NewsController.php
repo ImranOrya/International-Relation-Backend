@@ -23,32 +23,55 @@ class NewsController extends Controller
 
        $query = News::with([
         'newsTran' =>function ($query) use ($locale){
-            $query->where('language_name',$locale)->select('id','news_id','');
-        }
+            $query->where('language_name',$locale)->select('id','news_id','title');
+        },
+         'priority:id,name',
+        'newsType:id,name'
+
        ]);
+
        
        
     
        
 
     }
-    public function showNews(Request $request){
+    public function showNews(Request $request)
+{
 
-       $locale =App::getlocale();
 
-      $query =  News::with([
-           'newsTran' => function ($query) use ($locale){
-            $query->where('language_name',$locale)->select('id','news_id','contents');
-           },
-           'priority:id,name',
-           'newsType:id,name'
-           
-       ] )->where('visible',1)->where('submited',1);
-    
+    // return News::with('newsDocument')->get();
 
-       return $query->get();
+    $request->validate([
+        'searchValue' => 'string'
+    ]);
 
+    $locale = App::getLocale();
+
+    // Fetching news with optimized relations and filtering
+    $query = News::with([
+        'newsTran' => function ($query) use ($locale) {
+            $query->where('language_name', $locale)
+                ->select('id', 'news_id', 'title', 'contents');
+        },
+        'priority:id,name',
+        'newsType:id,name',
+        'newsDocument:id,news_id,url,extintion',
+    ])->where('visible', 1)
+      ->where('submited', 1);
+
+    // Add search condition if searchValue exists
+    if (!empty($request->searchValue)) {
+        $searchValue = $request->searchValue;
+
+        $query->whereHas('newsTran', function ($subQuery) use ($searchValue) {
+            $subQuery->where('title', 'like', "%{$searchValue}%")
+                ->orWhere('contents', 'like', "%{$searchValue}%");
+        });
     }
+
+    return $query->get();
+}
 
 
 public function store(NewsStoreRequest $request)
