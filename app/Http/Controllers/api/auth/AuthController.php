@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers\api\auth;
 
-use App\Models\User;
+use App\Enums\RoleEnum;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Destination;
 use App\Models\Email;
 use App\Models\ModelJob;
-use App\Models\Destination;
+use App\Models\Ngo;
+use App\Models\StatusTypeTran;
+use App\Models\User;
+use App\Models\UserDetail;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Requests\Auth\LoginRequest;
+use Illuminate\Support\Facades\DB;
 
 class AuthController extends Controller
 {
@@ -21,24 +25,14 @@ class AuthController extends Controller
             'contact:id,value',
             'email:id,value',
             'role:id,name',
+              'userStatus:id,status_type_id'
+
         ]);
         $userPermissions = $this->userWithPermission($user);
-
+        $userdetail = $this->userdetail($user);
         return response()->json(array_merge([
-            "user" => [
-                "id" => $user->id,
-                "full_name" => $user->full_name,
-                "username" => $user->username,
-                'email' => $user->email ? $user->email->value : "",
-                "profile" => $user->profile,
-                "status" => $user->status,
-                "grant" => $user->grant_permission,
-                "role" => ["role" => $user->role->id, "name" => $user->role->name],
-                'contact' => $user->contact ? $user->contact->value : "",
-                "destination" => $user->destination ? $this->getTranslationWithNameColumn($user->destination, Destination::class) : "",
-                "job" => $user->job ? $this->getTranslationWithNameColumn($user->job, ModelJob::class) : "",
-                "created_at" => $user->created_at,
-            ]
+            "user" => $userdetail
+            
         ], [
             "permissions" => $userPermissions["permissions"],
         ]), 200, [], JSON_UNESCAPED_UNICODE);
@@ -69,23 +63,13 @@ class AuthController extends Controller
                 'contact:id,value',
                 'email:id,value',
                 'role:id,name',
+                'userStatus:id,status_type_id'
             ]);
+           
+            $userdetail = $this->userdetail($user);
             return response()->json(
                 array_merge([
-                    "user" => [
-                        "id" => $user->id,
-                        "full_name" => $user->full_name,
-                        "username" => $user->username,
-                        'email' => $user->email ? $user->email->value : "",
-                        "profile" => $user->profile,
-                        "status" => $user->status,
-                        "grant" => $user->grant_permission,
-                        "role" => ["role" => $user->role->id, "name" => $user->role->name],
-                        'contact' => $user->contact ? $user->contact->value : "",
-                        "destination" => $user->destination ? $this->getTranslationWithNameColumn($user->destination, Destination::class) : "",
-                        "job" => $user->job ? $this->getTranslationWithNameColumn($user->job, ModelJob::class) : "",
-                        "created_at" => $user->created_at,
-                    ]
+                    "user" => $userdetail
                 ], [
                     "token" => $loggedIn['tokens']['access_token'],
                     "permissions" => $userPermissions["permissions"],
@@ -131,4 +115,68 @@ class AuthController extends Controller
             ->get();
         return ["user" => $user->toArray(), "permissions" => $userPermissions];
     }
+
+   protected function userdetail($user)
+{
+    $userId = $user->id;
+    $userRole = $user->role->name;
+
+    // Fetch status type for all roles
+    $status_type = StatusTypeTran::where('language_name', App::getLocale())
+        ->where('status_type_id', $user->userStatus->status_type_id)
+        ->select('id', 'name')
+        ->first();
+
+    // Handle regular user roles
+    if (in_array($userRole, [RoleEnum::user, RoleEnum::super, RoleEnum::admin, RoleEnum::debugger])) {
+        $userDetails = UserDetail::where('user_id', $userId)->first();
+
+        return $userDetails ? [
+            "id" => $user->id,
+            "full_name" => $userDetails->full_name,
+            "username" => $user->username,
+            'email' => $user->email ? $user->email->value : "",
+            "profile" => $user->profile,
+            "status" => $status_type,
+            "grant" => $userDetails->grant_permission,
+            "role" => ["role" => $user->role->id, "name" => $user->role->name],
+            'contact' => $user->contact ? $user->contact->value : "",
+            "destination" => $userDetails->destination ? $this->getTranslationWithNameColumn($userDetails->destination, Destination::class) : "",
+            "job" => $userDetails->job ? $this->getTranslationWithNameColumn($userDetails->job, ModelJob::class) : "",
+            "created_at" => $user->created_at,
+        ] : null;
+    }
+
+    // Handle NGO role
+    if ($userRole == RoleEnum::ngo) {
+        $ngoDetails = Ngo::where('user_id', $userId)->first();
+
+        return $ngoDetails ? [
+            "id" => $user->id,
+            "ngo_name" => $ngoDetails->ngoTrans()->name ?? "",
+            "username" => $user->username,
+            'email' => $user->email ? $user->email->value : "",
+            "profile" => $user->profile,
+            "status" => $status_type,
+            "role" => ["role" => $user->role->id, "name" => $user->role->name],
+            'contact' => $user->contact ? $user->contact->value : "",
+            "created_at" => $user->created_at,
+        ] : null;
+    }
+
+    // Handle Donor role
+    if ($userRole == RoleEnum::donor) {
+        // Add donor-specific logic here when available
+        return [
+            "id" => $user->id,
+            "username" => $user->username,
+            "role" => ["role" => $user->role->id, "name" => $user->role->name],
+            "created_at" => $user->created_at,
+        ];
+    }
+
+    // Default response if role is not recognized
+    return null;
+}
+
 }

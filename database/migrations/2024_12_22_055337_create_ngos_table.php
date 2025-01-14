@@ -29,16 +29,11 @@ return new class extends Migration
             $table->foreign('place_of_establishment')->references('id')->on('countries')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
-            $table->unsignedBigInteger('email_id')->nullable();
-            $table->foreign('email_id')->references('id')->on('emails')
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')
-                ->onDelete('set null');
-            $table->unsignedBigInteger('contact_id')->nullable();
-            $table->foreign('contact_id')->references('id')->on('contacts')
-                ->onUpdate('cascade')
-                ->onDelete('set null');
-            $table->string('password');
-            $table->string('profile')->nullable();
+                ->onDelete('no action');
+          
             $table->boolean('is_Editable')->default(true);
             $table->rememberToken();
             $table->timestamps();

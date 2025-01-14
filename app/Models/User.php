@@ -94,12 +94,18 @@ class User extends Authenticatable
             'id'
         );
     }
+
     // Define the relationship to the Permission model
     public function permissions()
     {
         return $this->hasManyThrough(Permission::class, UserPermission::class, 'user_id', 'name', 'id', 'permission');
     }
 
+      public function userStatus()
+    {
+        return $this->hasOne(UserStatus::class);
+    }
+    
     public function hasPermission($permission)
     {
         return $this->permissions()->where('permission', $permission)->exists();

@@ -30,28 +30,33 @@ class NgoController extends Controller
         $page = $request->input('page', 1); // Current page
 
         // Eager loading relationships
-        $query = Ngo::with([
-            'ngoTrans' => function ($query) use ($locale) {
-                $query->where('language_name', $locale)->select('id', 'ngo_id', 'name');
-            },
-            'ngoType' => function ($query) use ($locale) {
-                $query->with(['ngoTypeTrans' => function ($query) use ($locale) {
-                    $query->where('lang', $locale)->select('ngo_type_id', 'value as name');
-                }]);
-            },
-            'ngoStatus' => function ($query) {
-                $query->select('ngo_id', 'operation');
-            },
-            'agreement' => function ($query) {
-                $query->select('ngo_id', 'end_date');
-            },
-        ])
-            ->select([
-                'id',
-                'registration_no',
-                'date_of_establishment',
-                'ngo_type_id',
-            ]);
+   $query = Ngo::with([
+    'ngoTrans:id,ngo_id,name', // Selects only id, ngo_id, and name for translations
+    'ngoType' => function ($query) use ($locale) {
+        $query->with(['ngoTypeTrans' => function ($query) use ($locale) {
+            $query->where('language_name', $locale)
+                  ->select('ngo_type_id', 'value as name'); // Select only required fields
+        }])->select('id'); // Select only required fields for ngoType
+    },
+    'ngoStatus' => function ($query) use ($locale) {
+        $query->with(['ngoStatusType' => function ($query) use ($locale) {
+            $query->with(['statusTypeTran' => function ($query) use ($locale) {
+                $query->where('language_name', $locale)
+                      ->select('id', 'status_type_id', 'name'); // Filter by locale and select fields
+            }]);
+        }]);
+    },
+    'agreement' => function ($query) {
+        $query->select('ngo_id', 'end_date'); // Fetch only the required fields
+    },
+])
+->select([
+    'id',
+    'registration_no',
+    'date_of_establishment',
+    'ngo_type_id', // Fetch only necessary fields for Ngo
+]);
+
 
 
         // Apply filters
