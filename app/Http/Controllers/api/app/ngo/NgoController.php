@@ -36,11 +36,11 @@ class NgoController extends Controller
             },
             'ngoType' => function ($query) use ($locale) {
                 $query->with(['ngoTypeTrans' => function ($query) use ($locale) {
-                    $query->where('lang', $locale)->select('ngo_type_id', 'value as name');
+                    $query->where('language_name', $locale)->select('ngo_type_id', 'value as name');
                 }]);
             },
             'ngoStatus' => function ($query) {
-                $query->select('ngo_id', 'operation');
+                $query->select('ngo_id');
             },
             'agreement' => function ($query) {
                 $query->select('ngo_id', 'end_date');
@@ -98,8 +98,6 @@ class NgoController extends Controller
             }
         }
     }
-
-
 
     private function applyDateFilters($query, $startDate, $endDate)
     {
@@ -204,7 +202,7 @@ class NgoController extends Controller
             // Begin transaction
             DB::beginTransaction();
 
-            $path = $this->storeProfile($request,'ngo-profile');
+            $path = $this->storeProfile($request, 'ngo-profile');
             $ngo->update([
                 "profile" =>  $path,
             ]);

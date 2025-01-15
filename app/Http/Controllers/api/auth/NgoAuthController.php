@@ -17,8 +17,8 @@ class NgoAuthController extends Controller
         $locale = App::getLocale();
 
         $user = $request->user()->load([
-            'ngoTrans' => function ($user) use ($locale){
-            $user->where('language_name', $locale)->select('id', 'ngo_id', 'name as ngo_name');
+            'ngoTrans' => function ($user) use ($locale) {
+                $user->where('language_name', $locale)->select('id', 'ngo_id', 'name as ngo_name');
             },
             'contact:id,value',
             'email:id,value',
@@ -64,28 +64,29 @@ class NgoAuthController extends Controller
             }
             $locale = App::getLocale();
 
-        $user = $request->user()->load([
-            'ngoTrans' => function ($user) use ($locale){
-            $user->where('language_name', $locale)->select('id', 'ngo_id', 'name as ngo_name');
-            },
-            'contact:id,value',
-            'email:id,value',
-            'ngoStatus:id,status_type_is'
+            $user = $request->user()->load([
+                'ngoTrans' => function ($user) use ($locale) {
+                    $user->where('language_name', $locale)->select('id', 'ngo_id', 'name as ngo_name');
+                },
+                'contact:id,value',
+                'email:id,value',
+                'ngoStatus:id,status_type_is'
 
-        ]);
-        $userPermissions = $this->userWithPermission($user->id);
+            ]);
+            $userPermissions = $this->userWithPermission($user->id);
 
-        return response()->json(array_merge([
-            "ngo" => [
-                "id" => $user->id,
-                "ngo_name" => $user->ngo_name,
-                'email' => $user->email ? $user->email->value : "",
-                "profile" => $user->profile,
-                "status" => $user->ngoStatus ? $user->ngoStatus->status_type_is : "",
-                'contact' => $user->contact ? $user->contact->value : "",
-                "created_at" => $user->created_at,
-            ]
-        ], [
+            return response()->json(
+                array_merge([
+                    "ngo" => [
+                        "id" => $user->id,
+                        "ngo_name" => $user->ngo_name,
+                        'email' => $user->email ? $user->email->value : "",
+                        "profile" => $user->profile,
+                        "status" => $user->ngoStatus ? $user->ngoStatus->status_type_is : "",
+                        'contact' => $user->contact ? $user->contact->value : "",
+                        "created_at" => $user->created_at,
+                    ]
+                ], [
                     "token" => $loggedIn['tokens']['access_token'],
                     "permissions" => $userPermissions["permissions"],
                 ]),
@@ -93,7 +94,6 @@ class NgoAuthController extends Controller
                 [],
                 JSON_UNESCAPED_UNICODE
             );
-           
         } else {
             return response()->json([
                 'message' => __('app_translation.user_not_found')

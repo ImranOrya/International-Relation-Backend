@@ -14,10 +14,11 @@ class ProvinceController extends Controller
 {
     //
 
-    public function provinces(){
+    public function provinces()
+    {
 
-            $locale = App::getLocale();
-        
+        $locale = App::getLocale();
+
         $tr = [];
         if ($locale === LanguageEnum::default->value)
             $tr =  Province::select("name", 'id')->get();
@@ -27,28 +28,20 @@ class ProvinceController extends Controller
         return response()->json($tr, 200, [], JSON_UNESCAPED_UNICODE);
     }
 
-    public function district(Request $request,$provinceId)
+    public function district(Request $request, $provinceId)
     {
-
-
-
-            $locale = App::getLocale();
-     
+        $locale = App::getLocale();
         $tr = [];
         if ($locale === LanguageEnum::default->value)
-            $tr =  District::select("name", 'id')->where('province_id',$provinceId)->get();
+            $tr =  District::select("name", 'id')->where('province_id', $provinceId)->get();
         else {
             $tr = $this->getTableTranslations(District::class, $locale, 'desc');
 
-              $tr= Translate::join('districts','translable_id','=','districts.id')->where('translable_type', '=', District::class)->where('province_id',$provinceId)
-            ->where('language_name', '=', $locale)
-            ->select('translable_id as id','value as name')
-            ->get();
-
-
+            $tr = Translate::join('districts', 'translable_id', '=', 'districts.id')->where('translable_type', '=', District::class)->where('province_id', $provinceId)
+                ->where('language_name', '=', $locale)
+                ->select('translable_id as id', 'value as name')
+                ->get();
         }
         return response()->json($tr, 200, [], JSON_UNESCAPED_UNICODE);
-
     }
-
 }
