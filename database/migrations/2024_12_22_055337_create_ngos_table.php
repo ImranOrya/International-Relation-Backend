@@ -29,7 +29,7 @@ return new class extends Migration
             $table->foreign('place_of_establishment')->references('id')->on('countries')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('user_id')->unique();
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('no action');

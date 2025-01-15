@@ -2,27 +2,28 @@
 
 namespace App\Http\Controllers\api\template;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Email;
-use App\Enums\RoleEnum;
-use App\Models\Contact;
-use App\Models\ModelJob;
 use App\Enums\LanguageEnum;
+use App\Enums\RoleEnum;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\template\user\UpdateUserPasswordRequest;
+use App\Http\Requests\template\user\UpdateUserRequest;
+use App\Http\Requests\template\user\UserRegisterRequest;
+use App\Models\Contact;
 use App\Models\Destination;
+use App\Models\Email;
+use App\Models\ModelJob;
+use App\Models\RolePermission;
+use App\Models\User;
+use App\Models\UserDetail;
+use App\Models\UserPermission;
 use App\Models\UsersEnView;
 use App\Models\UsersFaView;
 use App\Models\UsersPsView;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Models\RolePermission;
-use App\Models\UserPermission;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\template\user\UpdateUserRequest;
-use App\Http\Requests\template\user\UserRegisterRequest;
-use App\Http\Requests\template\user\UpdateUserPasswordRequest;
 
 class UserController extends Controller
 {
@@ -208,7 +209,6 @@ class UserController extends Controller
         }
         // 3. Create User
         $newUser = User::create([
-            "full_name" => $request->full_name,
             "username" => $request->username,
             "email_id" => $email->id,
             "password" => Hash::make($request->password),
@@ -219,6 +219,12 @@ class UserController extends Controller
             "profile" => null,
             "status" => $request->status === "true" ? true : false,
             "grant_permission" => $request->grant === "true" ? true : false,
+        ]);
+
+        UserDetail::create([
+
+            "full_name" => $request->full_name,
+
         ]);
 
         // 4. Add user permissions

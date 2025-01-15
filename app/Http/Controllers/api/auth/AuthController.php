@@ -133,7 +133,7 @@ class AuthController extends Controller
 
         return $userDetails ? [
             "id" => $user->id,
-            "full_name" => $userDetails->full_name,
+            "full_name" => $userDetails->userDetailTran()->full_name,
             "username" => $user->username,
             'email' => $user->email ? $user->email->value : "",
             "profile" => $user->profile,

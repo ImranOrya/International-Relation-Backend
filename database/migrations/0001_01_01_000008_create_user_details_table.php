@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_details', function (Blueprint $table) {
+           Schema::create('user_details', function (Blueprint $table) {
             $table->id();
-            $table->string('full_name');
-               $table->unsignedBigInteger('destination_id')->nullable();
+           $table->unsignedBigInteger('user_id')->unique();
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onUpdate('cascade')
+                ->onDelete('set null');
+           $table->unsignedBigInteger('destination_id')->nullable();
             $table->foreign('destination_id')->references('id')->on('destinations')
                 ->onUpdate('cascade')
                 ->onDelete('set null');
-             $table->unsignedBigInteger('job_id')->nullable();
+            $table->unsignedBigInteger('job_id')->nullable();
             $table->foreign('job_id')->references('id')->on('model_jobs')
                 ->onUpdate('cascade')
                 ->onDelete('set null');
