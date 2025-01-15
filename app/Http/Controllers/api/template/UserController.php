@@ -2,27 +2,32 @@
 
 namespace App\Http\Controllers\api\template;
 
-use Carbon\Carbon;
-use App\Models\User;
-use App\Models\Email;
-use App\Enums\RoleEnum;
-use App\Models\Contact;
-use App\Models\ModelJob;
 use App\Enums\LanguageEnum;
+use App\Enums\RoleEnum;
+use App\Enums\StatusTypeEnum;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\template\user\UpdateUserPasswordRequest;
+use App\Http\Requests\template\user\UpdateUserRequest;
+use App\Http\Requests\template\user\UserRegisterRequest;
+use App\Models\Contact;
 use App\Models\Destination;
+use App\Models\Email;
+use App\Models\ModelJob;
+use App\Models\RolePermission;
+use App\Models\User;
+use App\Models\UserDetail;
+use App\Models\UserDetailTran;
+use App\Models\UserPermission;
 use App\Models\UsersEnView;
 use App\Models\UsersFaView;
 use App\Models\UsersPsView;
+use App\Models\UserStatus;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
-use App\Models\RolePermission;
-use App\Models\UserPermission;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
-use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Http\Requests\template\user\UpdateUserRequest;
-use App\Http\Requests\template\user\UserRegisterRequest;
-use App\Http\Requests\template\user\UpdateUserPasswordRequest;
+use PhpParser\Node\Stmt\TryCatch;
 
 class UserController extends Controller
 {
@@ -96,10 +101,24 @@ class UserController extends Controller
     public function user($id, Request $request)
     {
         // 1. Retrive current user all permissions
-        $foundUser = User::with(['userPermissions', 'contact', 'email', 'role', 'job', 'destination'])
+        $foundUser = User::with([
+            'userPermissions',
+             'contact',
+              'email',
+               'role', 
+               
+               ])
             ->find($id);
+          
+        $userdetail =UserDetail::with([
+            'job',
+            'destination'
+        ])->where('user_id',$id)->first();
 
+        $userstatus =UserStatus::find($id,'user_id');
 
+        $full_name=UserDetailTran::where('user_detail_id',$userdetail->id)->get();
+   
         if ($foundUser) {
             $rolePermissions = RolePermission::where('role', '=', $foundUser->role_id)
                 ->select('permission')
@@ -129,24 +148,25 @@ class UserController extends Controller
                 }
             }
 
+
             return response()->json([
                 "user" => [
                     "id" => $foundUser->id,
-                    "full_name" => $foundUser->full_name,
+                    "full_name" => $full_name,
                     "username" => $foundUser->username,
                     'email' => $foundUser->email ? $foundUser->email->value : null,
                     "profile" => $foundUser->profile,
-                    "status" => $foundUser->status,
+                    "status" => $userstatus,
                     "grant" => $foundUser->grant_permission,
                     "role" => $foundUser->role,
                     'contact' => $foundUser->contact ? $foundUser->contact->value : null,
                     "destination" => [
-                        'id' => $foundUser->destination_id,
-                        'name' => $this->getTranslationWithNameColumn($foundUser->destination, Destination::class)
+                        'id' => $userdetail->destination_id,
+                        'name' => $this->getTranslationWithNameColumn($userdetail->destination, Destination::class)
                     ],
                     "job" => [
-                        'id' => $foundUser->job_id,
-                        'name' => $this->getTranslationWithNameColumn($foundUser->job, ModelJob::class),
+                        'id' => $userdetail->job_id,
+                        'name' => $this->getTranslationWithNameColumn($userdetail->job, ModelJob::class),
                     ],
                     "created_at" => $foundUser->created_at,
                 ],
@@ -208,17 +228,41 @@ class UserController extends Controller
         }
         // 3. Create User
         $newUser = User::create([
-            "full_name" => $request->full_name,
             "username" => $request->username,
             "email_id" => $email->id,
             "password" => Hash::make($request->password),
             "role_id" => $request->role,
-            "job_id" => $request->job,
-            "destination_id" => $request->destination,
             "contact_id" => $contact ? $contact->id : $contact,
             "profile" => null,
             "status" => $request->status === "true" ? true : false,
+        ]);
+
+      $userdetail =  UserDetail::create([
+            "user_id" =>$newUser->id,
+            "job_id" => $request->job,
+            "destination_id" => $request->destination,
             "grant_permission" => $request->grant === "true" ? true : false,
+
+
+
+        ]);
+        UserDetail::create([
+            'user_detail_id' => $userdetail->id,
+            'language_name' =>LanguageEnum::default,
+            "full_name" => $request->full_name_en,
+    
+        ]);
+          UserDetail::create([
+            'user_detail_id' => $userdetail->id,
+            'language_name' =>LanguageEnum::pashto,
+            "full_name" => $request->full_name_ps,
+    
+        ]);
+          UserDetail::create([
+            'user_detail_id' => $userdetail->id,
+            'language_name' =>LanguageEnum::farsi,
+            "full_name" => $request->full_name_fa,
+    
         ]);
 
         // 4. Add user permissions
@@ -248,7 +292,7 @@ class UserController extends Controller
                     $userPermissions->save();
             }
         }
-        $newUser->load('job', 'destination',); // Adjust according to your relationships
+        $userdetail->load('job', 'destination',); // Adjust according to your relationships
         return response()->json([
             'user' => [
                 "id" => $newUser->id,
@@ -256,8 +300,8 @@ class UserController extends Controller
                 'email' => $request->email,
                 "profile" => $newUser->profile,
                 "status" => $newUser->status,
-                "destination" => $this->getTranslationWithNameColumn($newUser->destination, Destination::class),
-                "job" => $this->getTranslationWithNameColumn($newUser->job, ModelJob::class),
+                "destination" => $this->getTranslationWithNameColumn($userdetail->destination, Destination::class),
+                "job" => $this->getTranslationWithNameColumn($userdetail->job, ModelJob::class),
                 "createdAt" => $newUser->created_at,
             ],
             'message' => __('app_translation.success'),
@@ -266,46 +310,66 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request)
     {
         $request->validated();
-        // 1. User is passed from middleware
+
+        // Retrieve user and associated details
         $user = $request->get('validatedUser');
-        if ($user) {
-            // 2. Check email
+        $userdetail = UserDetail::where('user_id', $user->id)->first();
+        $userstatus = UserStatus::where('user_id', $user->id)->first();
+
+        if (!$user || !$userdetail || !$userstatus) {
+            $missing = !$user ? 'user' : (!$userdetail ? 'user_detail' : 'user_status');
+            return response()->json(['message' => __('app_translation.' . $missing . '_not_found')], 404);
+        }
+
+        // Update email if changed
+        if ($user->email_id) {
             $email = Email::find($user->email_id);
             if ($email && $email->value !== $request->email) {
-                // 2.1 Email is changed
-                // Delete old email
-                $email->delete();
-                // Add new email
-                $newEmail = Email::create([
-                    "value" => $request->email
-                ]);
-                $user->email_id = $newEmail->id;
+                $email->update(['value' => $request->email]);
             }
-            // 3. Check contact
-            if (!$this->addOrRemoveContact($user, $request)) {
-                return response()->json([
-                    'message' => __('app_translation.contact_exist'),
-                ], 400, [], JSON_UNESCAPED_UNICODE);
-            }
-
-            // 4. Update User other attributes
-            $user->full_name = $request->full_name;
-            $user->username = $request->username;
-            $user->role_id = $request->role;
-            $user->job_id = $request->job;
-            $user->destination_id = $request->destination;
-            $user->status = $request->status === "true" ? true : false;
-            $user->grant_permission = $request->grant === "true" ? true : false;
-            $user->save();
-
-            return response()->json([
-                'message' => __('app_translation.success'),
-            ], 200, [], JSON_UNESCAPED_UNICODE);
         }
-        return response()->json([
-            'message' => __('app_translation.not_found'),
-        ], 404, [], JSON_UNESCAPED_UNICODE);
+
+        // Check and update contact
+        if (!$this->addOrRemoveContact($user, $request)) {
+            return response()->json([
+                'message' => __('app_translation.contact_exist'),
+            ], 400, [], JSON_UNESCAPED_UNICODE);
+        }
+
+        // Update user, user details, and user status attributes
+        $user->fill([
+            'username' => $request->username,
+            'role_id' => $request->role,
+        ]);
+        $userdetail->fill([
+            'job_id' => $request->job,
+            'destination_id' => $request->destination,
+            "grant_permission" => $request->grant === "true" ? true : false,
+
+        ]);
+        $userstatus->status_type_id = $request->status_id;
+
+        // Save all updated models in a transaction for consistency
+        DB::transaction(function () use ($user, $userdetail, $userstatus) {
+            $user->save();
+            $userdetail->save();
+            $userstatus->save();
+        });
+
+        // Update translations for each language
+        foreach (['en', 'ps', 'fa'] as $language) {
+            $translation = UserDetailTran::where('language_name', $language)
+                ->where('user_detail_id', $userdetail->id)
+                ->first();
+            if ($translation) {
+                $translation->update(['full_name' => $request->input("full_name_$language")]);
+            }
+        }
+
+        return response()->json(['message' => __('app_translation.success')], 200, [], JSON_UNESCAPED_UNICODE);
     }
+
+
     public function destroy($id)
     {
         $user = User::find($id);
@@ -319,10 +383,14 @@ class UserController extends Controller
             Email::where('id', '=', $user->email_id)->delete();
             // 2. Delete user contact
             Contact::where('id', '=', $user->contact_id)->delete();
+            UserStatus::where('user_id',$user->id)->deleteI();
+            $userdetail= UserDetail::find($user->id,'user_id');
+            UserDetailTran::where('user_detail_id',$userdetail->id)->delete();
             $user->delete();
             return response()->json([
                 'message' => __('app_translation.success'),
             ], 200, [], JSON_UNESCAPED_UNICODE);
+            
         } else {
             return response()->json([
                 'message' => __('app_translation.failed'),
@@ -403,12 +471,13 @@ class UserController extends Controller
     }
     public function userCount()
     {
+        $statusTypeEnum =StatusTypeEnum::active;
         $statistics = DB::select("
             SELECT
                 COUNT(*) AS userCount,
                 (SELECT COUNT(*) FROM users WHERE DATE(created_at) = CURDATE()) AS todayCount,
-                (SELECT COUNT(*) FROM users WHERE status = 1) AS activeUserCount,
-                (SELECT COUNT(*) FROM users WHERE status = 0) AS inActiveUserCount
+                (SELECT COUNT(*) FROM users u join user_status us on u.id = us.user_id WHERE us.status_type_id ={$statusTypeEnum}) AS activeUserCount,
+                (SELECT COUNT(*) FROM users WHERE status != {$statusTypeEnum} ) AS inActiveUserCount
             FROM users
         ");
         return response()->json([

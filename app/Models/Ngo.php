@@ -6,6 +6,7 @@ use App\Traits\template\Auditable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\App;
 use Sway\Traits\InvalidatableToken;
 
 
@@ -41,7 +42,7 @@ class Ngo extends Model
     
     public function ngoTrans()
     {
-        return $this->hasMany(NgoTran::class);
+        return $this->hasMany(NgoTran::class)->where('language_name', App::getLocale());;
     }
 
     public function ngoType()
@@ -49,10 +50,10 @@ class Ngo extends Model
         return $this->belongsTo(NgoType::class, 'ngo_type_id');
     }
 
-    public function ngoStatus()
-    {
-        return $this->hasOne(NgoStatus::class, 'ngo_id', 'id');
-    }
+      
+
+
+  
 
 
     public function agreement()

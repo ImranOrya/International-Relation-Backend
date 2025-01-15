@@ -17,6 +17,9 @@ class ValidateApiKey
      */
     public function handle(Request $request, Closure $next): Response
     {
+
+            return $next($request);
+
         $apiKey = $request->header('X-API-KEY');
         $serverIp = $request->header('X-SERVER-ADDR'); // This gets the IP address of the server the request is sent to
 

@@ -29,7 +29,6 @@ class User extends Authenticatable
         'remember_token',
     ];
     protected $casts = [
-        'grant_permission' => 'boolean',
         'status' => 'boolean',
         'created_at' => 'datetime',
     ];
@@ -58,50 +57,31 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Role::class, 'role_id', "id");
     }
-    public function destination()
-    {
-        return $this->belongsTo(Destination::class, 'destination_id', "id");
-    }
-    public function job()
-    {
-        return $this->belongsTo(ModelJob::class, 'job_id', "id");
-    }
+ 
     public function userPermissions()
     {
         return $this->hasMany(UserPermission::class, 'user_id', 'id');
     }
 
-    public function destinationThrough()
-    {
-        return $this->hasOneThrough(
-            Translate::class,
-            Destination::class,
-            'id',
-            'translable_id',
-            'destination_id',
-            'id'
-        );
-    }
 
-    public function jobThrough()
-    {
-        return $this->hasOneThrough(
-            Translate::class,
-            ModelJob::class,
-            'id',
-            'translable_id',
-            'job_id',
-            'id'
-        );
-    }
     // Define the relationship to the Permission model
     public function permissions()
     {
         return $this->hasManyThrough(Permission::class, UserPermission::class, 'user_id', 'name', 'id', 'permission');
+
+
+       
     }
 
+      public function userStatus()
+    {
+        return $this->hasOne(UserStatus::class);
+    }
+    
     public function hasPermission($permission)
     {
         return $this->permissions()->where('permission', $permission)->exists();
     }
+
+    
 }

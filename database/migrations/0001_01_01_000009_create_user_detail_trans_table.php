@@ -11,17 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ngo_statuses', function (Blueprint $table) {
+        Schema::create('user_detail_trans', function (Blueprint $table) {
             $table->id();
-           $table->unsignedBigInteger('ngo_id');
-            $table->foreign('ngo_id')->references('id')->on('ngos')
+            $table->string('full_name');
+            $table->unsignedBigInteger('user_detail_id');
+            $table->foreign('user_detail_id')->references('id')->on('user_details')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
-            $table->unsignedBigInteger('status_type_id');
-            $table->foreign('status_type_id')->references('id')->on('status_types')
+                   $table->string('language_name');
+            $table->foreign('language_name')->references('name')->on('languages')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
-            $table->string('comment',128);
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ngo_statuses');
+        Schema::dropIfExists('user_detail_trans');
     }
 };

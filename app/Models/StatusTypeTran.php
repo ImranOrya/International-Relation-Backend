@@ -5,17 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class StatusType extends Model
+class StatusTypeTran extends Model
 {
     //
-      use HasFactory;
+ use HasFactory;
     protected $guarded = [];
 
 
-
-    public function statusTypeTran()
-    {
-        return $this->hasMany(StatusTypeTran::class);
-    }
-
+    
 }

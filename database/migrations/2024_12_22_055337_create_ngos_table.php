@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('abbr', 16);
             $table->string('registration_no', 64);
-            $table->string('date_of_establishment')->nullable();
+            $table->string('establishment_date')->nullable();
             $table->unsignedBigInteger('ngo_type_id');
             $table->foreign('ngo_type_id')->references('id')->on('ngo_types')
                 ->onUpdate('cascade')
@@ -29,16 +29,10 @@ return new class extends Migration
             $table->foreign('place_of_establishment')->references('id')->on('countries')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
-            $table->unsignedBigInteger('email_id')->nullable();
-            $table->foreign('email_id')->references('id')->on('emails')
+            $table->unsignedBigInteger('user_id')->unique();
+            $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')
-                ->onDelete('set null');
-            $table->unsignedBigInteger('contact_id')->nullable();
-            $table->foreign('contact_id')->references('id')->on('contacts')
-                ->onUpdate('cascade')
-                ->onDelete('set null');
-            $table->string('password');
-            $table->string('profile')->nullable();
+                ->onDelete('no action');
             $table->boolean('is_editable')->default(true);
             $table->rememberToken();
             $table->timestamps();

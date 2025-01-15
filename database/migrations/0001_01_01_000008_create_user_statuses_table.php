@@ -11,14 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('donors', function (Blueprint $table) {
+        Schema::create('user_statuses', function (Blueprint $table) {
             $table->id();
-
-
-            $table->unsignedBigInteger('user_id')->nullable();
+           $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
+            $table->unsignedBigInteger('status_type_id');
+            $table->foreign('status_type_id')->references('id')->on('status_types')
+                ->onUpdate('cascade')
+                ->onDelete('no action');
+            $table->string('comment',128)->default('no comment');
             $table->timestamps();
         });
     }
@@ -28,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('donors');
+        Schema::dropIfExists('ngo_statuses');
     }
 };

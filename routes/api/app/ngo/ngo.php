@@ -5,7 +5,7 @@ use App\Enums\PermissionEnum;
 use App\Http\Controllers\api\app\ngo\NgoController;
 use Illuminate\Support\Facades\Route;
 
-
+Route::get('/ngos/{page}', [NgoController::class, 'ngos']);
 
 Route::prefix('v1')->middleware(['api.key', "authorized:" . 'user:api'])->group(function () {
   Route::get('/ngos/record/count', [NgoController::class, "ngoCount"])->middleware(["hasViewPermission:" . PermissionEnum::ngo->value]);

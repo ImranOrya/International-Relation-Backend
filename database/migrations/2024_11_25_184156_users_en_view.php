@@ -18,17 +18,23 @@ return new class extends Migration
             u.id,
             u.username,
             u.profile,
-            u.status,
+            stt.name AS status,
             u.created_at,
             e.value as email,
 			c.value as contact,
             d.name as destination,
             j.name as job
         FROM users u
+        LEFT JOIN user_details ud ON u.id = ud.user_id
+        
         LEFT JOIN contacts c ON u.contact_id = c.id
-        LEFT JOIN emails e ON u.email_id = e.id
-        LEFT JOIN model_jobs j ON u.job_id = j.id
-        LEFT JOIN destinations d ON u.destination_id = d.id;
+         LEFT JOIN emails e ON u.email_id = e.id
+        LEFT JOIN user_statuses us ON u.id = us.user_id
+        LEFT JOIN status_types st ON us.status_type_id = st.id
+        LEFT JOIN status_type_trans stt 
+            ON st.id = stt.status_type_id AND stt.language_name = "en"
+        LEFT JOIN model_jobs j ON ud.job_id = j.id
+        LEFT JOIN destinations d ON ud.destination_id = d.id;
     ');
     }
 

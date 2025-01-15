@@ -2,31 +2,37 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
-use App\Models\User;
-use App\Models\Email;
+use App\Enums\LanguageEnum;
 use App\Enums\RoleEnum;
+use App\Enums\StatusTypeEnum;
 use App\Models\Contact;
 use App\Models\Country;
-use App\Models\NgoType;
-use App\Models\Setting;
+use App\Models\Destination;
+use App\Models\DestinationType;
 use App\Models\District;
+use App\Models\Email;
 use App\Models\Language;
 use App\Models\ModelJob;
+use App\Models\NgoType;
+use App\Models\NgoTypeTrans;
+use App\Models\Permission;
 use App\Models\Province;
+use App\Models\RequestType;
+use App\Models\Role;
+use App\Models\RolePermission;
+use App\Models\Setting;
+use App\Models\SettingTimeUnit;
+use App\Models\StatusType;
+use App\Models\StatusTypeTran;
 use App\Models\TimeUnit;
 use App\Models\Translate;
-use App\Models\Permission;
-use App\Models\StatusType;
-use App\Models\Destination;
-use App\Models\RequestType;
-use App\Models\NgoTypeTrans;
-use App\Enums\StatusTypeEnum;
-use App\Models\RolePermission;
+use App\Models\User;
+use App\Models\UserDetail;
+use App\Models\UserDetailTran;
 use App\Models\UserPermission;
-use App\Models\DestinationType;
-use App\Models\SettingTimeUnit;
+use App\Models\UserStatus;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
@@ -40,6 +46,9 @@ class DatabaseSeeder extends Seeder
         $this->languages();
         $this->settings();
         $this->requestTypes();
+        $this->statusType();
+
+
         $email =  Email::factory()->create([
             "value" => "super@admin.com"
         ]);
@@ -97,51 +106,163 @@ class DatabaseSeeder extends Seeder
 
         $this->offic($muqam);
         $this->destinations($directorate);
-        User::factory()->create([
-            'full_name' => 'Sayed Naweed Sayedy',
+        $user =   User::factory()->create([
             'username' => 'super@admin.com',
             'email_id' =>  $email->id,
             'password' =>  Hash::make("123123123"),
-            'status' =>  true,
-            'grant_permission' =>  true,
             'role_id' =>  RoleEnum::super,
             'contact_id' =>  $contact->id,
+        ]);
+        UserStatus::create([
+            'user_id' => $user->id,
+            'status_type_id' =>StatusTypeEnum::active,
+            
+        ]);
+        $userdetail = UserDetail::create(
+            [
+            'user_id' =>$user->id,
+            'grant_permission' =>  true,
             'job_id' =>  $job->id,
             'destination_id' =>  1,
+
+            ]
+            );
+        UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::default,
+            'full_name' => 'Sayed Naweed Sayedy',
+            
         ]);
-        User::factory()->create([
-            'full_name' => 'Jalal Bakhti',
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::farsi,
+            'full_name' => 'نوید',
+            
+        ]);
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::pashto,
+            'full_name' => 'نوید',
+            
+        ]);
+     
+       $user=  User::factory()->create([
             'username' => 'Jalal Bakhti',
             'email_id' =>  $userEmail->id,
             'password' =>  Hash::make("123123123"),
-            'status' =>  true,
-            'grant_permission' =>  true,
             'role_id' =>  RoleEnum::user,
+        ]);
+             UserStatus::create([
+            'user_id' => $user->id,
+            'status_type_id' =>StatusTypeEnum::active,
+            
+        ]);
+         $userdetail = UserDetail::create(
+            [
+            'user_id' =>$user->id,
+            'grant_permission' =>  true,
             'job_id' =>  $job->id,
             'destination_id' =>  16,
+
+            ]
+            );
+        UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::default,
+            'full_name' => 'Jalal ul din Bakhti',
+            
         ]);
-        User::factory()->create([
-            'full_name' => 'Sayed Naweed Sayedy',
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::farsi,
+            'full_name' => 'جلال',
+            
+        ]);
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::pashto,
+            'full_name' => 'جلال',
+            
+        ]);
+     
+       $user = User::factory()->create([
             'username' => 'debugger@admin.com',
             'email_id' =>  $debuggerEmail->id,
             'password' =>  Hash::make("123123123"),
-            'status' =>  true,
-            'grant_permission' =>  true,
             'role_id' =>  RoleEnum::debugger,
+        ]);
+        
+         UserStatus::create([
+            'user_id' => $user->id,
+            'status_type_id' =>StatusTypeEnum::active,
+            
+        ]);
+         $userdetail = UserDetail::create(
+            [
+            'user_id' =>$user->id,
+            'grant_permission' =>  true,
             'job_id' =>  $job->id,
             'destination_id' =>  1,
+
+            ]
+            );
+        UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::default,
+            'full_name' => 'Sayed Naweed Sayedy',
+            
         ]);
-        User::factory()->create([
-            'full_name' => 'Waheed Safi',
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::farsi,
+            'full_name' => 'نوید',
+        ]);
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::pashto,
+            'full_name' => 'نوید',
+            
+        ]);
+     
+      $user =  User::factory()->create([
             'username' => 'Waheed',
             'email_id' =>  $adminEmail->id,
             'password' =>  Hash::make("123123123"),
-            'status' =>  true,
-            'grant_permission' =>  true,
             'role_id' =>  RoleEnum::admin,
-            'job_id' =>  $job->id,
-            'destination_id' =>  16,
         ]);
+         UserStatus::create([
+            'user_id' => $user->id,
+            'status_type_id' =>StatusTypeEnum::active,
+            
+        ]);
+         $userdetail = UserDetail::create(
+            [
+            'user_id' =>$user->id,
+            'grant_permission' =>  true,
+            'job_id' =>  $job->id,
+            'destination_id' =>  1,
+
+            ]
+            );
+        UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::default,
+            'full_name' => 'waheed safi',
+            
+        ]);
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::farsi,
+            'full_name' => 'وحید صافی',
+            
+        ]);
+          UserDetailTran::create([
+            'user_detail_id' =>$userdetail->id,
+            'language_name' =>LanguageEnum::pashto,
+            'full_name' => 'وحید صافی',
+            
+        ]);
+     
         // Icons
         $dashboard = 'public/icons/home.svg';
         $users = 'public/icons/users-group.svg';
@@ -457,7 +578,6 @@ class DatabaseSeeder extends Seeder
 
         $this->rolePermission();
         $this->ngoTypes();
-        $this->statusType();
         $this->countries();
     }
     public function ngoTypes()
@@ -516,28 +636,102 @@ class DatabaseSeeder extends Seeder
     public function statusType()
     {
 
-        StatusType::factory()->create([
+        $statustype =    StatusType::factory()->create([
 
             'id' => StatusTypeEnum::active,
-            'name' => 'Active'
+          
+        ]);
+      
+
+        DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'en',
+            'name' =>'active'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'ps',
+            'name' =>'فعال'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'fa',
+            'name' =>'فعال'
+
         ]);
 
 
-        StatusType::factory()->create([
+     $statustype =     StatusType::factory()->create([
 
             'id' => StatusTypeEnum::blocked,
-            'name' => 'Blocked'
         ]);
-        StatusType::factory()->create([
+              DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'en',
+            'name' =>'Blocked'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'ps',
+            'name' =>'مسدود'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'fa',
+            'name' =>'بند'
+
+        ]);
+        $statustype =  StatusType::factory()->create([
 
             'id' => StatusTypeEnum::not_logged_in,
-            'name' => 'Not_Logged_In'
+        
         ]);
-        StatusType::factory()->create([
+               DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'en',
+            'name' =>'Not_Logged_In'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'ps',
+            'name' =>'تا حالا داخل نشد'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'fa',
+            'name' =>'تر اوسه داخل شوی نه ده'
+
+        ]);
+
+        $statustype =  StatusType::factory()->create([
 
             'id' => StatusTypeEnum::unregistered,
-            'name' => 'Unregistered'
         ]);
+                  DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'en',
+            'name' =>'Unregistered'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'ps',
+            'name' =>'بدون راجستر'
+
+        ]);
+            DB::table('status_type_trans')->insert([
+            'status_type_id' => $statustype->id,
+            'language_name' => 'fa',
+            'name' =>'بغیر ثبت  نام'
+
+        ]);
+        
     }
     public function settings()
     {
