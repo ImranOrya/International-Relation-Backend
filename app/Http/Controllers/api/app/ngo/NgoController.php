@@ -53,7 +53,7 @@ class NgoController extends Controller
 ->select([
     'id',
     'registration_no',
-    'date_of_establishment',
+    'establishment_date',
     'ngo_type_id', // Fetch only necessary fields for Ngo
 ]);
 
@@ -110,11 +110,11 @@ class NgoController extends Controller
     {
         if ($startDate || $endDate) {
             if ($startDate && $endDate) {
-                $query->whereBetween('ngos.date_of_establishment', [$startDate, $endDate]);
+                $query->whereBetween('ngos.establishment_date', [$startDate, $endDate]);
             } elseif ($startDate) {
-                $query->where('ngos.date_of_establishment', '>=', $startDate);
+                $query->where('ngos.establishment_date', '>=', $startDate);
             } elseif ($endDate) {
-                $query->where('ngos.date_of_establishment', '<=', $endDate);
+                $query->where('ngos.establishment_date', '<=', $endDate);
             }
         }
     }

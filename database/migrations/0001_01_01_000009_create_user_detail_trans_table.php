@@ -17,11 +17,11 @@ return new class extends Migration
             $table->unsignedBigInteger('user_detail_id');
             $table->foreign('user_detail_id')->references('id')->on('user_details')
                 ->onUpdate('cascade')
-                ->onDelete('set null');
-            $table->unsignedBigInteger('language_name');
-            $table->foreign('language_name')->references('id')->on('languages')
+                ->onDelete('no action');
+                   $table->string('language_name');
+            $table->foreign('language_name')->references('name')->on('languages')
                 ->onUpdate('cascade')
-                ->onDelete('set null');
+                ->onDelete('no action');
             $table->timestamps();
         });
     }

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreign('status_type_id')->references('id')->on('status_types')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
-            $table->string('comment',128);
+            $table->string('comment',128)->default('no comment');
             $table->timestamps();
         });
     }

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('abbr', 16);
             $table->string('registration_no', 64);
-            $table->string('date_of_establishment')->nullable();
+            $table->string('establishment_date')->nullable();
             $table->unsignedBigInteger('ngo_type_id');
             $table->foreign('ngo_type_id')->references('id')->on('ngo_types')
                 ->onUpdate('cascade')

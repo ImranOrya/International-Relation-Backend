@@ -16,7 +16,7 @@ return new class extends Migration
            $table->unsignedBigInteger('user_id')->unique();
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')
-                ->onDelete('set null');
+                ->onDelete('no action');
            $table->unsignedBigInteger('destination_id')->nullable();
             $table->foreign('destination_id')->references('id')->on('destinations')
                 ->onUpdate('cascade')
@@ -26,7 +26,7 @@ return new class extends Migration
                 ->onUpdate('cascade')
                 ->onDelete('set null');
            
-
+            $table->boolean('grant_permission');
             $table->timestamps();
         });
     }
