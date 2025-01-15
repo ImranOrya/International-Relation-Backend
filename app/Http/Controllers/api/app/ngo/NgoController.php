@@ -58,7 +58,6 @@ class NgoController extends Controller
 ]);
 
 
-
         // Apply filters
         $this->applyDateFilters($query, $request->input('filters.date.startDate'), $request->input('filters.date.endDate'));
         $this->applySearchFilter($query, $request->input('filters.search'));
@@ -103,8 +102,6 @@ class NgoController extends Controller
             }
         }
     }
-
-
 
     private function applyDateFilters($query, $startDate, $endDate)
     {
@@ -200,7 +197,6 @@ class NgoController extends Controller
 
         if (!$ngo || $ngo->is_editable != 1) {
             return response()->json(['message' => __('app_translation.notEditable')], 403);
-       
         }
 
 
@@ -210,7 +206,7 @@ class NgoController extends Controller
             // Begin transaction
             DB::beginTransaction();
 
-            $path = $this->storeProfile($request,'ngo-profile');
+            $path = $this->storeProfile($request, 'ngo-profile');
             $ngo->update([
                 "profile" =>  $path,
             ]);

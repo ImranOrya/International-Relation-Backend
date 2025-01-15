@@ -33,8 +33,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')
                 ->onUpdate('cascade')
                 ->onDelete('no action');
-          
-            $table->boolean('is_Editable')->default(true);
+            $table->boolean('is_editable')->default(true);
             $table->rememberToken();
             $table->timestamps();
         });
